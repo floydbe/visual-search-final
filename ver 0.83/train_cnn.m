@@ -27,7 +27,7 @@
 clear;
 clc;
 %Load the digits into workspace
-[I,labels,I_test,labels_test] = readMNIST(1000); 
+[I,labels,I_test,labels_test] = readMNIST(60000); 
 %%
 
 %Define the structure according to [2]
@@ -96,7 +96,7 @@ sinet.CLayer{6}.numKernels = 120;
 sinet.CLayer{6}.KernWidth = 5;
 sinet.CLayer{6}.KernHeight = 5;
 %Weights 3000
-%Смещений 120
+%пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 120
 
 %Seventh layer - fully connected, 84 neurons
 sinet.FLayer{7}.numNeurons = 84;
