@@ -1,4 +1,4 @@
-The only file you need to run to demonstrate the system is mnist_cnn.m. It is inside the 
+The only file you need to run to demonstrate the system is mnist_cnn.m. It is inside the code/ folder.
 
 Below, you will find the header from that file, which should have all the information you are looking for, such as included libraries and cited techniques. You can read it here, or just head to the source and see it there. I have attempted to document that program very well, so I hope you find reading the source very clear. 
 
