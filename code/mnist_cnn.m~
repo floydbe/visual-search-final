@@ -1,15 +1,24 @@
-% An implementation of Convolutional Neural Network training and testing based
-% on the MNIST handwritten digit dataset. 
+% An implementation of Convolutional Neural Network training and testing 
+% based on the MNIST handwritten digit dataset. 
 
-% This implementation is based on the Convlutional Neural Network (CNN) Class
-% provided by Mihail Sirotenko. It is available at:
-% http://www.mathworks.com/matlabcentral/fileexchange/24291-cnn-convolutional-neural-network-class
-% The implementation details of CNN as well as the definitions of several associated
-% methods come from here. Any attributes of the dignet object defined below belong
-% to Sirtenko's implementation. Any other instances in which this program dishes
-% out to a provided function are marked clearly in their documentation. The necessary 
-% files from this class are included in the tarball submission, so there is no
-% need to download anything. 
+% This implementation is based on the Convlutional Neural Network (CNN)
+% Class provided by Mihail Sirotenko. It is available at:
+% http://www.mathworks.com/matlabcentral/fileexchange/24291-cnn-convolutional-neural-network-class.
+% The implementation details of CNN as well as the definitions of several 
+% associated methods come from here. Any attributes of the dignet object 
+% defined below belong to Sirtenko's implementation. Any other instances in
+% which this program dishes out to a provided function are marked clearly
+% in their documentation. The entire class is included in the zipfile
+% submission (including many parts that are not actually used), so there is
+% no need to download anything. 
+
+% A notable feature of this class's training implementation is a GUI
+% displaying, among other things, the percentage completion of the training
+% process. Note that this GUI is not my implementation, but it is very
+% useful in predicting the timing of the training process. However, aspects
+% the GUI can cause warnings. Be sure to close the GUI before attemping 
+% subsequent runs. There is no GUI for the testing process (which begins as
+% soon as the training is complete).
 
 % The other primary source for this implementation is the CNN structure defined in:
 %	Y. LeCun, L. Bottou, Y. Bengio and P. Haffner: Gradient-Based Learning
@@ -27,8 +36,8 @@ clc;
 % for quite a long time. As submitted, they are set to considerably lower values
 % to encourage a runtime measured in minutes, not hours. However, this code does
 % function correctly on the maximum dataset if you are willing to wait.
-trainNum = 10000;
-testNum = 1000;
+trainNum = 1500;
+testNum = 1500;
 
 % First, need to read in the dataset. Using readMNIST.m (provided) to obtain
 % the training images, training labels, testing images, and testing labels. 
@@ -149,3 +158,17 @@ dignet.teta_dec = 0.4;
 [I_test_p, labels_test_p] = preproc_data(I_test,testNum,labels_test,0);
 % finally, actually perform the training
 dignet = train(dignet,I_train_p,labels_train_p,I_test_p,labels_test_p);
+
+% Now, with dignet trained, we just need to evaluate its performance.
+% The idea is simple: just loop through the test set, have dignet predict
+% the proper label, then check if that matches the test label for that
+% image. The number of correct classifications over the number of test inp
+correct=0;
+[I_testp,labnew] = preproc_data(I_test,testNum,labels_test,0);
+for t=1:testNum
+    [out(t,:), dignet] = sim(dignet,I_testp{t});    
+    if(find(out(t,:)==max(out(t,:)))==(labnew(t)+1))
+        correct=correct+1;
+    end
+end
+acc = correct/testNum

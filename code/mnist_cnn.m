@@ -1,28 +1,29 @@
-%Convolutional neural network for handwriten digits recognition: training
-%and simulation.
-%(c)Mikhail Sirotenko, 2009.
-%This program implements the convolutional neural network for MNIST handwriten 
-%digits recognition, created by Yann LeCun. CNN class allows to make your
-%own convolutional neural net, defining arbitrary structure and parameters.
-%It is assumed that MNIST database is located in './MNIST' directory.
-%References:
-%1. Y. LeCun, L. Bottou, G. Orr and K. Muller: Efficient BackProp, in Orr, G.
-%and Muller K. (Eds), Neural Networks: Tricks of the trade, Springer, 1998
-%URL:http://yann.lecun.com/exdb/publis/index.html
-%2. Y. LeCun, L. Bottou, Y. Bengio and P. Haffner: Gradient-Based Learning
-%Applied to Document Recognition, Proceedings of the IEEE, 86(11):2278-2324, November 1998
-%URL:http://yann.lecun.com/exdb/publis/index.html
-%3. Patrice Y. Simard, Dave Steinkraus, John C. Platt: Best Practices for
-%Convolutional Neural Networks Applied to Visual Document Analysis
-%URL:http://research.microsoft.com/apps/pubs/?id=68920
-%4. Thanks to Mike O'Neill for his great article, wich is summarize and
-%generalize all the information in 1-3 for better understandig for
-%programming:
-%URL: http://www.codeproject.com/KB/library/NeuralNetRecognition.aspx
-%5. Also thanks to Jake Bouvrie for his "Notes on Convolutional Neural
-%Networks", particulary for the idea to debug the neural network using
-%finite differences
-%URL: http://web.mit.edu/jvb/www/cv.html
+% An implementation of Convolutional Neural Network training and testing 
+% based on the MNIST handwritten digit dataset. 
+
+% This implementation is based on the Convlutional Neural Network (CNN)
+% Class provided by Mihail Sirotenko. It is available at:
+% http://www.mathworks.com/matlabcentral/fileexchange/24291-cnn-convolutional-neural-network-class.
+% The implementation details of CNN as well as the definitions of several 
+% associated methods come from here. Any attributes of the dignet object 
+% defined below belong to Sirtenko's implementation. Any other instances in
+% which this program dishes out to a provided function are marked clearly
+% in their documentation. The entire class is included in the zipfile
+% submission (including many parts that are not actually used), so there is
+% no need to download anything. 
+
+% A notable feature of this class's training implementation is a GUI
+% displaying, among other things, the percentage completion of the training
+% process. Note that this GUI is not my implementation, but it is very
+% useful in predicting the timing of the training process. However, aspects
+% the GUI can cause warnings. Be sure to close the GUI before attemping 
+% subsequent runs. There is no GUI for the testing process (which begins as
+% soon as the training is complete).
+
+% The other primary source for this implementation is the CNN structure defined in:
+%	Y. LeCun, L. Bottou, Y. Bengio and P. Haffner: Gradient-Based Learning
+%	Applied to Document Recognition, Proceedings of the IEEE, 86(11):2278-2324, November 1998
+% available at http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
 
 clear;
 clc;
@@ -35,8 +36,8 @@ clc;
 % for quite a long time. As submitted, they are set to considerably lower values
 % to encourage a runtime measured in minutes, not hours. However, this code does
 % function correctly on the maximum dataset if you are willing to wait.
-trainNum = 10000
-testNum = 1000
+trainNum = 1000;
+testNum = 1000;
 
 % First, need to read in the dataset. Using readMNIST.m (provided) to obtain
 % the training images, training labels, testing images, and testing labels. 
@@ -156,4 +157,19 @@ dignet.teta_dec = 0.4;
 [I_train_p, labels_train_p] = preproc_data(I_train,trainNum,labels_train,0);
 [I_test_p, labels_test_p] = preproc_data(I_test,testNum,labels_test,0);
 % finally, actually perform the training
-dignet = train(dignet,I_p,labels_train_p,I_test_p,labels_test_p);
+dignet = train(dignet,I_train_p,labels_train_p,I_test_p,labels_test_p);
+
+% Now, with dignet trained, we just need to evaluate its performance.
+% The idea is simple: just loop through the test set, have dignet predict
+% the proper label, then check if that matches the test label for that
+% image. The number of correct classifications over the number of test
+% inputs is the accuracy. 
+correct=0;
+[I_testp,labnew] = preproc_data(I_test,testNum,labels_test,0);
+for t=1:testNum
+    [out(t,:), dignet] = sim(dignet,I_testp{t});    
+    if(find(out(t,:)==max(out(t,:)))==(labnew(t)+1))
+        correct=correct+1;
+    end
+end
+acc = correct/testNum
