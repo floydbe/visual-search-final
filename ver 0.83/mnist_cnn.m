@@ -104,16 +104,16 @@ sinet.FLayer{7}.numNeurons = 84;
 %Biases 84
 
 %Eight layer - fully connected, 10 output neurons
-sinet.FLayer{8}.numNeurons = 10;
+dignet.FLayer{8}.numNeurons = 10;
 %Weights 840
 %Biases 10
 
 %Initialize the network
-sinet = init(sinet);
+dignet = init(dignet);
 
 %According to [2] the generalisation is better if there's unsimmetry in
 %layers connections. Yann LeCun uses this kind of connection map:
-sinet.CLayer{4}.ConMap = ...
+dignet.CLayer{4}.ConMap = ...
 [1 0 0 0 1 1 1 0 0 1 1 1 1 0 1 1;
  1 1 0 0 0 1 1 1 0 0 1 1 1 1 0 1;
  1 1 1 0 0 0 1 1 1 0 0 1 0 1 1 1;
@@ -121,39 +121,33 @@ sinet.CLayer{4}.ConMap = ...
  0 0 1 1 1 0 0 1 1 1 1 0 1 1 0 1; 
  0 0 0 1 1 1 0 0 1 1 1 1 0 1 1 1; 
 ]';
-%but some papers proposes to randomly generate the connection map. So you
-%can try it:
-%sinet.CLayer{6}.ConMap = round(rand(size(sinet.CLayer{6}.ConMap))-0.1);
-sinet.SLayer{1}.WS{1} = ones(size(sinet.SLayer{1}.WS{1}));
-sinet.SLayer{1}.BS{1} = zeros(size(sinet.SLayer{1}.BS{1}));
-%In my impementation output layer is ordinary tansig layer as opposed to
-%[1,2], but I plan to implement the radial basis output layer
+dignet.SLayer{1}.WS{1} = ones(size(dignet.SLayer{1}.WS{1}));
+dignet.SLayer{1}.BS{1} = zeros(size(dignet.SLayer{1}.BS{1}));
 
-%sinet.FLayer{8}.TransfFunc = 'radbas';
-
-
-%%
 %Now the final preparations
 %Number of epochs
-sinet.epochs = 3;
+dignet.epochs = 3;
 %Mu coefficient for stochastic Levenberg-Markvardt
-sinet.mu = 0.001;
+dignet.mu = 0.001;
 %Training coefficient
 %sinet.teta =  [50 50 20 20 20 10 10 10 5 5 5 5 1]/100000;
-sinet.teta =  0.0005;
+dignet.teta =  0.0005;
 %0 - Hessian running estimate is calculated every iteration
 %1 - Hessian approximation is recalculated every cnet.Hrecomp iterations
 %2 - No Hessian calculations are made. Pure stochastic gradient
-sinet.HcalcMode = 0;    
-sinet.Hrecalc = 300; %Number of iterations to passs for Hessian recalculation
-sinet.HrecalcSamplesNum = 50; %Number of samples for Hessian recalculation
+dignet.HcalcMode = 0;    
+dignet.Hrecalc = 300; %Number of iterations to passs for Hessian recalculation
+dignet.HrecalcSamplesNum = 50; %Number of samples for Hessian recalculation
 
 %Teta decrease coefficient
-sinet.teta_dec = 0.4;
+dignet.teta_dec = 0.4;
 
 %Images preprocessing. Resulting images have 0 mean and 1 standard
 %deviation. Go inside the preproc_data for details
-[Ip, labtrn] = preproc_data(I,1000,labels,0);
-[I_testp, labtst] = preproc_data(I_test,100,labels_test,0);
-%Actualy training
-sinet = train(sinet,Ip,labtrn,I_testp,labtst);
+% Using preproc_data.m (provided), which takes the Images and Labels and
+% processes them so the images have 0 mean and 1 standard deviations.
+% Resulting images are 32x32, which is slightly larger than the input 28x28.
+[I_train_p, labels_train_p] = preproc_data(I_train,1000,labels_train,0);
+[I_test_p, labels_test_p] = preproc_data(I_test,100,labels_test,0);
+% finally, actually perform the training
+dignet = train(dignet,I_p,labels_train_p,I_test_p,labels_test_p);
